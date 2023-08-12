@@ -26,6 +26,8 @@ detailed description of these approaches will be introduced in section "How".
 
 ## How
 In this tutorial, we will focus on Collaborative filtering techniques.
+### Problem definition
+
 ### Matrix factorization techniques
 Let us assume f is the number of factors. Now we will try to model user-item interactions in Rf space. With each item i and each user u we associate vectors qi ∈ Rf and pu ∈ Rf , accordingly. Vector qi represents items embeddings and vector pu represents users embeddings. The values of qi measure the extent of which a given item has some factor. Similarly, the values of pu show how much interest a given user has for a specific item factor. For user u the overall interest for item i is then captured by a dot product qT i pu. Assuming we have access to users ratings we can write a formula for rating prediction
 ### Neighborhood methods
@@ -33,9 +35,55 @@ The main idea that stands behind Neighborhood models is fairly simple. We try to
 items that are liked by similar users or items which are similar to items liked by a specific user.
 We can highlight two different approaches - one focused on users and one focused on items
 
-### Problem definition
-
 ## Hands-on example
+```python
+import pandas as pd
+```
+
+
+```python
+!dir "./../data/"
+```
+
+     Volume in drive D is Nowy
+     Volume Serial Number is 7EA6-BDA1
+    
+     Directory of D:\MM\mefor44.github.io\data
+    
+    12.08.2023  16:39    <DIR>          .
+    12.08.2023  16:39    <DIR>          ..
+    12.08.2023  16:39           978˙202 ml-latest-small.zip
+                   1 File(s)        978˙202 bytes
+                   2 Dir(s)  623˙882˙334˙208 bytes free
+    
+
+
+```python
+df = pd.read_csv('./../data/ml-latest-small.zip', compression='zip', header=0, sep=',', quotechar='"')
+```
+
+
+```python
+import zipfile
+import pandas as pd
+with zipfile.ZipFile("./../data/ml-latest-small.zip") as z:
+    with z.open("ml-latest-small/ratings.csv") as f:
+        ratings = pd.read_csv(f, delimiter=",")
+```
+
+
+```python
+print(ratings.head())    # print the first 5 rows
+```
+
+       userId  movieId  rating  timestamp
+    0       1        1     4.0  964982703
+    1       1        3     4.0  964981247
+    2       1        6     4.0  964982224
+    3       1       47     5.0  964983815
+    4       1       50     5.0  964982931
+    
+
 
 Sources:
 
