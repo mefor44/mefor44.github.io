@@ -18,17 +18,8 @@ We may have different types of data to work with. The most basic datatype are us
 
 ### Taxonomy
 Bla bla 
-\begin{table}[H]
-\resizebox{\linewidth}{!}{\begin{tabular}{|l|l|l|}
-\hline
-Approach                                      & Conceptual Goal                                                                                                                                                                       & Input                                                                                               \\ \hline
-\multicolumn{1}{|l|}{Collaborative filtering} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Give me recommendations based on a collaborative approach, \\ that leverages the ratings and actions of my peers/myself.\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}User ratings,\\ community ratings\end{tabular}}     \\ \hline
-\multicolumn{1}{|l|}{Content-based}           & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Give me recommendations based on the content (attributes)\\ I have favored in my past ratings and actions.\end{tabular}}               & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}User ratings,\\ item attributes\end{tabular}}       \\ \hline
-Knowledge-based                               & \begin{tabular}[c]{@{}l@{}}Give me recommendations based on my explicit specification\\ of the content (attributes) I want.\end{tabular}                                      & \begin{tabular}[c]{@{}l@{}}User specification,\\ item attributes,\\ domain knowledge\end{tabular} \\ \hline
-\end{tabular}}
-\caption{Different types of recommender systems, source: \cite{aggarwal}.}
-\label{tab:rec-sys-taxonomy}
-\end{table}
+![image](https://github.com/mefor44/mefor44.github.io/assets/61019250/385c759d-6692-46b8-aa15-bc348f752a7a)
+
 
 ## How
 
