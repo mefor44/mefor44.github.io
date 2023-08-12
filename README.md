@@ -4,8 +4,16 @@ In this class let's focus our attention on recommender systems. These are comple
 2. What, 
 3. How
 
-Of course all in the context of recommender systems. Ehh... Of course all in the context of recommender systems. Ehh...
-Of course all in the context of recommender systems. Ehh... Of course all in the context of recommender systems. Ehh... Of course all in the context of recommender systems. Ehh...
+Of course all in the context of recommender systems. Ehh... 
+
+## Why
+Recommender systems aim at providing personalized product suggestions to customers. In the era of gargantuan numbers of different products choosing the right one for you can be an arduous task [paradox of choice](https://en.wikipedia.org/wiki/The_Paradox_of_Choice). Recommender systems aim to solve this problem. Having access to user browse history, demographical data, items characteristics it aims at reducing 
+ Product recommendation is a complex problem. Preparing a list of products is just one of the steps. Website design, how each product will be presented, how many products to show, etc. all play vital role in succesful product recommendations. In this tutorial will be be only considering how to prepare personalized recommendation list. 
+## What
+
+## How
 
 
-fdssfdf
+
+Sources:
+
