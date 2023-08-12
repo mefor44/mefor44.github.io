@@ -3,4 +3,5 @@ In this class let's focus our attention on recommender systems. These are comple
 1. Why,
 2. What, 
 3. How <br />
-Of course all in the context of recommender systems.
+Of course all in the context of recommender systems. Ehh...
+
