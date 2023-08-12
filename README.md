@@ -25,7 +25,7 @@ unknown rating as a weighted average of similar items to the one that we want to
 detailed description of these approaches will be introduced in section "How".
 
 ## How
-
+In this tutorial, we will focus on Collaborative filtering techniques.
 ### Matrix factorization techniques
 Let us assume f is the number of factors. Now we will try to model user-item interactions in Rf space. With each item i and each user u we associate vectors qi ∈ Rf and pu ∈ Rf , accordingly. Vector qi represents items embeddings and vector pu represents users embeddings. The values of qi measure the extent of which a given item has some factor. Similarly, the values of pu show how much interest a given user has for a specific item factor. For user u the overall interest for item i is then captured by a dot product qT i pu. Assuming we have access to users ratings we can write a formula for rating prediction
 ### Neighborhood methods
@@ -35,7 +35,7 @@ We can highlight two different approaches - one focused on users and one focused
 
 ### Problem definition
 
-
+## Hands-on example
 
 Sources:
 
