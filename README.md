@@ -30,11 +30,19 @@ In this tutorial, we will focus on Collaborative filtering techniques.
 ### Problem definition
 
 ### Matrix factorization techniques
-Let us assume $f$ is the number of factors. Now we will try to model user-item interactions in $Rf$ space. With each item i and each user u we associate vectors qi ∈ Rf and pu ∈ Rf , accordingly. Vector qi represents items embeddings and vector pu represents users embeddings. The values of qi measure the extent of which a given item has some factor. Similarly, the values of pu show how much interest a given user has for a specific item factor. For user u the overall interest for item i is then captured by a dot product qT i pu. Assuming we have access to users ratings we can write a formula for rating prediction
+Let us assume $f$ is the number of factors. Now we will try to model user-item interactions in $\mathbb{R}^f$ space. With each item $i$ and each user $u$ we associate vectors $q_i \in \mathbb{R}^f$ and $p_u  \in \mathbb{R}^f$, accordingly. Vector $q_i$ represents items embeddings and vector $p_u$ represents users embeddings. The values of $q_i$ measure the extent of which a given item has some factor. Similarly, the values of $p_u$ show how much interest a given user has for a specific item factor. For user $u$ the overall interest for item $i$ is then captured by a dot product $q_i^T p_u$. Assuming we have access to users ratings we can write a formula for rating prediction:
+\begin{equation}
+    \hat{r}_{ui} = q_i^T p_u.
+    \label{eq:mf-baseline}
+\end{equation}
 ### Neighborhood methods
 The main idea that stands behind Neighborhood models is fairly simple. We try to suggest
 items that are liked by similar users or items which are similar to items liked by a specific user.
 We can highlight two different approaches - one focused on users and one focused on items
+
+
+### Evaluation
+Daadad
 
 ## Hands-on example
 ```python
