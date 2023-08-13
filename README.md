@@ -32,15 +32,7 @@ In this tutorial, we will focus on Collaborative filtering techniques.
 ### Matrix factorization techniques
 Let us assume $f$ is the number of factors. Now we will try to model user-item interactions in $\mathbb{R}^f$ space. With each item $i$ and each user $u$ we associate vectors $q_i \in \mathbb{R}^f$ and $p_u  \in \mathbb{R}^f$, accordingly. Vector $q_i$ represents items embeddings and vector $p_u$ represents users embeddings. The values of $q_i$ measure the extent of which a given item has some factor. Similarly, the values of $p_u$ show how much interest a given user has for a specific item factor. For user $u$ the overall interest for item $i$ is then captured by a dot product $q_i^T p_u$. Assuming we have access to users ratings we can write a formula for rating prediction:
 $$\hat{r}_{ui} = q_i^T p_u.$$
-
-### Neighborhood methods
-The main idea that stands behind Neighborhood models is fairly simple. We try to suggest
-items that are liked by similar users or items which are similar to items liked by a specific user.
-We can highlight two different approaches - one focused on users and one focused on items
-
-
-### Evaluation
-Daadad
+TODO: add more equations, a bit more theory, 1-2 images
 
 ## Hands-on example
 ```python
@@ -184,7 +176,9 @@ plt.show()
 
 
     
-![png](output_7_0.png)
+
+![output_7_0](https://github.com/mefor44/mefor44.github.io/assets/61019250/94dc21f2-5f08-458e-a77b-4a9dffc22cde)
+
     
 
 
@@ -623,7 +617,8 @@ plt.show()
 
 
     
-![output_7_0](https://github.com/mefor44/mefor44.github.io/assets/61019250/6c25b506-25ae-4ffd-af53-24cafe9cc572)
+![output_36_0](https://github.com/mefor44/mefor44.github.io/assets/61019250/ae1990c1-371a-429a-8e1d-44666d8fe3a1)
+
 
     
 
