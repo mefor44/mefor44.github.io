@@ -4,7 +4,7 @@ In this class let's focus our attention on recommender systems. These are comple
 2. What, 
 3. How
 
-Of course all in the context of recommender systems. Ehh... 
+Of course all in the context of recommender systems.
 
 ## Why
 Recommender systems aim at providing personalized product suggestions to customers. In the era of gargantuan numbers of different products choosing the right one for you can be an arduous task [paradox of choice](https://en.wikipedia.org/wiki/The_Paradox_of_Choice). Recommender systems aim to solve this problem. Having access to user browse history, demographical data, items characteristics it aims at reducing the space of items to only a few relevant (usually 10,20,...). Big retailers often rely on them. On Amazon 35% of their products are bought from recommendations produced by their recommender systems. For Netflix this number is even more substantial [more here](https://www.mckinsey.com/industries/retail/our-insights/how-retailers-can-keep-up-with-consumers).
@@ -31,10 +31,8 @@ In this tutorial, we will focus on Collaborative filtering techniques.
 
 ### Matrix factorization techniques
 Let us assume $f$ is the number of factors. Now we will try to model user-item interactions in $\mathbb{R}^f$ space. With each item $i$ and each user $u$ we associate vectors $q_i \in \mathbb{R}^f$ and $p_u  \in \mathbb{R}^f$, accordingly. Vector $q_i$ represents items embeddings and vector $p_u$ represents users embeddings. The values of $q_i$ measure the extent of which a given item has some factor. Similarly, the values of $p_u$ show how much interest a given user has for a specific item factor. For user $u$ the overall interest for item $i$ is then captured by a dot product $q_i^T p_u$. Assuming we have access to users ratings we can write a formula for rating prediction:
-\begin{equation}
-    \hat{r}_{ui} = q_i^T p_u.
-    \label{eq:mf-baseline}
-\end{equation}
+$$\hat{r}_{ui} = q_i^T p_u.$$
+
 ### Neighborhood methods
 The main idea that stands behind Neighborhood models is fairly simple. We try to suggest
 items that are liked by similar users or items which are similar to items liked by a specific user.
