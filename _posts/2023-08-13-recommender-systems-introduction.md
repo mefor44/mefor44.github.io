@@ -5,7 +5,6 @@ date:   2023-08-14 07:44:17 +0100
 author: Mateusz Marzec
 usemathjax: true
 ---
-{% include math.html %}
 
 In this tutorial let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
 1. Why,
@@ -40,7 +39,10 @@ In this tutorial, we will focus on Collaborative filtering techniques.
 ### Matrix factorization techniques
 Let us assume $f$ is the number of factors. Now we will try to model user-item interactions in $\mathbb{R}^f$ space. With each item $i$ and each user $u$ we associate vectors $q_i \in \mathbb{R}^f$ and $p_u  \in \mathbb{R}^f$, accordingly. Vector $q_i$ represents items embeddings and vector $p_u$ represents users embeddings. The values of $q_i$ measure the extent of which a given item has some factor. Similarly, the values of $p_u$ show how much interest a given user has for a specific item factor. For user $u$ the overall interest for item $i$ is then captured by a dot product $q_i^T p_u$. Assuming we have access to users ratings we can write a formula for rating prediction:
 $$\hat{r}_{ui} = q_i^T p_u.$$
-TODO: add more equations, a bit more theory, 1-2 images
+TODO: add more equations, a bit more theory, 1-2 images $$f$$
+$$
+a = b
+$$
 
 ## Hands-on example
 ```python
