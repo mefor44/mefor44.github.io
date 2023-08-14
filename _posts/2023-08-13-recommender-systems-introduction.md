@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Reccommender systems introduction"
+title:  "Recommender systems introduction"
 date:   2023-08-14 07:44:17 +0100
 author: Mateusz Marzec
 usemathjax: true
