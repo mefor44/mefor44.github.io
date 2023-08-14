@@ -49,13 +49,14 @@ $$
 p(u,i) = \sigma(q_i^T p_u),
 $$
 
-where $$\sigma$$ is logit function (same as in logistic regression). 
+where $$\sigma$$ is logit function (same as in logistic regression). A visual example of how matrix factorization works is presented below:
 
-Example:
-![Alt text](./../resources/recommender-systems-introduction/image.png "Title1")
-![Alt text](../resources/recommender-systems-introduction/image.png "Title2")
-![Alt text](./resources/recommender-systems-introduction/image.png "Title3")
-
+<figure>
+  <img
+  src="/resources/recommender-systems-introduction/matrix-factorization-vis.png"/>
+  <figcaption class="figure-caption text-center">How matrix factorization works. (<a href="https://developers.google.com/machine-learning/recommendation/collaborative/matrix?hl=en">Image source</a>).</figcaption>
+</figure>
+In this example we decompose user-item interaction matrix into two 2 dimensional metrices. One for user representation and one for item representation. To obtain score for a given user-item pair we just take the dot product between correct vectors.
 
 TODO: add more equations, a bit more theory, 1-2 images
 
@@ -93,6 +94,19 @@ ratings.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -188,9 +202,7 @@ plt.show()
 
 
     
-
-![output_7_0](https://github.com/mefor44/mefor44.github.io/assets/61019250/94dc21f2-5f08-458e-a77b-4a9dffc22cde)
-
+![png](/resources/recommender-systems-introduction/movielens-countt-agg-daily.png)
     
 
 
@@ -199,7 +211,8 @@ Let's split the data on the last day. So in our example this will be day "1970-0
 \* Random split is just randomly selecting interactions for test set. <br />
 \*\* Leave-one-out split is selecting just one item for each user. Assume that we know temporal ordering and in such case leave-one-out selects last item from each user interaction history. Recall, that's not the same ase leave-one-out cross validation strategy!!!
 
-**Answer:** TODO
+**Answer:** 
+Greatest advantage of this type of split is it's robustness to data leakages phenomena. For random split is trivial to see why leakage can happen. In leave-one-out split, last interaction of certain user can have a timestamp smaller than some observations from test set. This is dangerous, as some information from train data can leak to test set. One of the disadvantages is poor users coverage. Having test set taken from just one day, most of the users will have exactly zero interactions during that day (so we won't know how model will handle them in real scenario). Moreover, some users will have many interactions, other only one or two. Most of the ranking metrics at some point average the score over users - they don't consider that some users had more interacions in test set.
 
 
 ```python
@@ -239,9 +252,6 @@ train["items_mapped"] = train["movieId"].apply(lambda x: i_to_ids[x])
 n_users, n_items
 ```
     (532, 6236)
-
-
-
 
 ```python
 print(f"Test n obs before merge = {test.shape[0]}")
@@ -295,9 +305,7 @@ class MatrixFactorization(nn.Module):
 ## Evaluation
 Evaluation of the recommender system can be performed in various settings. The two main ways to do so are online evaluation and offline evaluation. The online evaluation uses a continuous stream of users feedback to access system performance. In practice, it is often difficult to design settings allowing for such evaluation. Offline evaluation is based on historical data and it is the most common way of evaluating recommender system models. When designing evaluation methodology for a recommender system, we have to consider our goals. In the early stages of research in this field, calculating RMSE, MSE or MAE (Mean Absolute Error) was a very popular way of accessing the performance of the recommender system. This was, of course, connected with the data availability - the main datasets available online consisted of explicit ranking. Therefore, recommendation problem was often treated as a regression problem so typical regression metrics were used. When the data was in a binary form - metrics based on classification were used. The current standard are ranking based metrics. They give the biggest weights to the items placed at the top of the ranking list, which mimics the goal of top-k recommendation. <br /> In this tutorial we will focus on **Recall@k** which is a metric build upon Recall used for standard classification problems. For a given user we can define: 
 
-$$
-Recall@k = \frac{number\ of\ relevant\ items}{total\ number\ of\ items},
-$$
+$$Recall@k = \frac{number\ of\ relevant\ items}{total\ number\ of\ items},$$ 
 
 the number $$k$$ is the length of the recommendation list. To calculate Recall@k for the whole dataset we average the values of recall for each user. <br />
 
@@ -387,19 +395,31 @@ for k in [5,10, 30]:
     print(f"Recall@{k} = {mean_recall}")
 ```
 
-    Recall@5 = 0.2076923076923077
-    Recall@10 = 0.2192307692307692
-    Recall@30 = 0.2918701492828226
+    Recall@5 = 0.18461538461538465
+    Recall@10 = 0.18119658119658125
+    Recall@30 = 0.2642334231890363
     
 
+
+```python
+# helper function, we will use it later during trainig
+def score_recall(model, positives_test_encoded, negatives_test_encoded, k):
+    scored = score(model, positives_test_encoded, negatives_test_encoded)
+    recalls = [recall_k(k, pred) for pred in scored.values()]
+    return np.mean(recalls)
+```
+
 ## Training
+Now, we will train implemented models. We need to define some training hyperparameters (learning rate, batch size and the number of epochs), initilize optimizer and model and implement custom dataset class (we could live without it, but it simplifies code during training) and training loop.
 
 
 ```python
 lr = 1e-3
 batch_size = 64
-n_epochs = 20
+n_epochs = 40
 ```
+
+For the loss function we will use Binary cross entropy, as we are treating our problem as a classification problem.
 
 
 ```python
@@ -408,8 +428,6 @@ model = MatrixFactorization(n_factors=20, n_users=n_users, n_items=n_items)
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 loss_function = nn.BCEWithLogitsLoss()
 ```
-
-### Train without sampling
 
 
 ```python
@@ -435,10 +453,13 @@ dataset = MovieLensDataset(train, output_col=None)
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 ```
 
+### Train without sampling
+In classification problems we have both negative and positive instances, but here we only have positives. In this section we will try to train a model only on positive interactions.
+
 
 ```python
-def train_fn(model, optimizer, n_epochs, dataloader, verbose_n_steps=None):
-    epoch_losses = []
+def train_fn(model, optimizer, n_epochs, dataloader, verbose_n_steps=None, eval_recall=True, k=10):
+    epoch_losses, recalls = [], []
     global_step = 0
     epoch_loss = []
     for epoch in range(1, n_epochs+1):
@@ -472,172 +493,66 @@ def train_fn(model, optimizer, n_epochs, dataloader, verbose_n_steps=None):
         epoch_losses.append(e_loss)
         print(f"Avg loss after epoch {epoch}, is equal to {e_loss}")
         
-    return epoch_losses
+        if eval_recall:
+            r = score_recall(model, positives_test_encoded, negatives_test_encoded, k)
+            print(f"Recall@{k} (test set) after epoch {epoch}, is equal to {r}")
+            recalls.append(r)
+            
+    return epoch_losses, recalls
 ```
 
 
 ```python
-losses = train_fn(model, optimizer, n_epochs, dataloader, verbose_n_steps=None)
+losses, recalls = train_fn(model, optimizer, n_epochs, dataloader, verbose_n_steps=None)
 ```
 
     Running epoch 1
+    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 397.44it/s]
+    Avg loss after epoch 1, is equal to 1.8510106407988793
+    Recall@10 (test set) after epoch 1, is equal to 0.24658119658119657
     
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 397.20it/s]
-    
-
-    Avg loss after epoch 1, is equal to 1.8580522157925798
     Running epoch 2
+    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 308.31it/s]
+    Avg loss after epoch 2, is equal to 1.7544759394481668
+    Recall@10 (test set) after epoch 2, is equal to 0.2388888888888889
     
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 340.06it/s]
+    .
+    .
+    .
     
-
-    Avg loss after epoch 2, is equal to 1.7605639855676345
-    Running epoch 3
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 370.42it/s]
-    
-
-    Avg loss after epoch 3, is equal to 1.6689885777214621
-    Running epoch 4
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 348.11it/s]
-    
-
-    Avg loss after epoch 4, is equal to 1.58399221989539
-    Running epoch 5
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 309.03it/s]
-    
-
-    Avg loss after epoch 5, is equal to 1.5054682094473606
-    Running epoch 6
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 350.01it/s]
-    
-
-    Avg loss after epoch 6, is equal to 1.4327366010838465
-    Running epoch 7
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 394.62it/s]
-    
-
-    Avg loss after epoch 7, is equal to 1.365114063665969
-    Running epoch 8
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 368.35it/s]
-    
-
-    Avg loss after epoch 8, is equal to 1.301935816899947
-    Running epoch 9
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 375.92it/s]
-    
-
-    Avg loss after epoch 9, is equal to 1.2424298995056535
-    Running epoch 10
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 339.83it/s]
-    
-
-    Avg loss after epoch 10, is equal to 1.1858883501461017
-    Running epoch 11
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 386.94it/s]
-    
-
-    Avg loss after epoch 11, is equal to 1.1316509076805308
-    Running epoch 12
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 385.81it/s]
-    
-
-    Avg loss after epoch 12, is equal to 1.0792415794314527
-    Running epoch 13
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 392.45it/s]
-    
-
-    Avg loss after epoch 13, is equal to 1.0284188995336874
-    Running epoch 14
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 373.28it/s]
-    
-
-    Avg loss after epoch 14, is equal to 0.979218807900179
-    Running epoch 15
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 363.49it/s]
-    
-
-    Avg loss after epoch 15, is equal to 0.9318551711666142
-    Running epoch 16
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 383.92it/s]
-    
-
-    Avg loss after epoch 16, is equal to 0.8866259280290952
-    Running epoch 17
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 345.88it/s]
-    
-
-    Avg loss after epoch 17, is equal to 0.8438032736280271
-    Running epoch 18
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 380.06it/s]
-    
-
-    Avg loss after epoch 18, is equal to 0.8035636928840015
-    Running epoch 19
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 375.72it/s]
-    
-
-    Avg loss after epoch 19, is equal to 0.7659687397161672
-    Running epoch 20
-    
-
-    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 377.37it/s]
-
-    Avg loss after epoch 20, is equal to 0.7309841856805622
-    
-
-    
-    
-
+    Running epoch 40
+    100%|███████████████████████████████████████████████████████████████████████████████| 804/804 [00:02<00:00, 292.07it/s]
+    Avg loss after epoch 40, is equal to 0.39081827431721494
+    Recall@10 (test set) after epoch 40, is equal to 0.35042735042735046
 
 ```python
-plt.plot([i+1 for i in range(len(losses))],  losses, "o")
-plt.xlabel("epoch")
-plt.ylabel("loss")
-plt.xticks([i+1 for i in range(len(losses))])
-plt.show()
+# plot training loss
+def plot_vector(vector, title=None, xlabel="epoch", ylabel="loss", figsize=(12,5)):
+    plt.figure(figsize=figsize)
+    plt.plot([i+1 for i in range(len(vector))],  vector, "o")
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xticks([i+1 for i in range(len(vector))])
+    plt.show()
+
+plot_vector(losses, ylabel="loss", figsize=(14,5))
 ```
 
 
     
-![output_36_0](https://github.com/mefor44/mefor44.github.io/assets/61019250/ae1990c1-371a-429a-8e1d-44666d8fe3a1)
+![png](/resources/recommender-systems-introduction/mf_train_loss.png)
+    
 
 
+
+```python
+# plot recall@10 on test set
+plot_vector(recalls, ylabel="Recall@10", figsize=(14,5))
+```
+
+
+    
+![png](/resources/recommender-systems-introduction/mf_recall10_test.png)
     
 
 
@@ -650,21 +565,22 @@ for k in [5,10, 30]:
     print(f"Recall@{k} = {mean_recall}")
 ```
 
-    Recall@5 = 0.22307692307692306
-    Recall@10 = 0.22820512820512825
-    Recall@30 = 0.32142323629990205
+    Recall@5 = 0.31538461538461543
+    Recall@10 = 0.35042735042735046
+    Recall@30 = 0.48000679156622084
     
 
 ### Train with sampling
-for each interaction from train set sample one negative intraction. There are many ways of sampling, but for simplicity we will focus on simplest approach - random sampling.
+Here, we want to enrich training data with negative instances. There are many ways of sampling, but for simplicity we will focus on simplest approach - random sampling. It simply samples observations uniformly from (user, item) pairs. <br />
+
+**Exercise:** <br />
+For each interaction from train set sample one negative interaction with random sampling. Merge that with training data and train model with the same hyperparameters, for the same number of epochs and compare obtained results. <br />
+
+**Solution:**
 
 
 ```python
 n_negatives = train.shape[0]
-```
-
-
-```python
 users_sampled = np.random.choice(users, n_negatives)
 items_sampled = np.random.choice(items, n_negatives)
 negative_df = pd.DataFrame({"userId":users_sampled, "movieId":items_sampled, "output":np.zeros(n_negatives)})
@@ -684,122 +600,74 @@ dataset_sampled = MovieLensDataset(train_sampled)
 dataloader_sampled = DataLoader(dataset_sampled, batch_size=batch_size, shuffle=True)
 
 
-model = MatrixFactorization(n_factors=20, n_users=n_users, n_items=n_items)
+model_negatives = MatrixFactorization(n_factors=20, n_users=n_users, n_items=n_items)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+optimizer = torch.optim.Adam(model_negatives.parameters(), lr=lr)
 loss_function = nn.BCEWithLogitsLoss()
 ```
 
 
 ```python
-# TODO n_epochs=20
-train_fn(model, optimizer, n_epochs=10, dataloader=dataloader_sampled)
-
+losses, recalls = train_fn(model_negatives, optimizer, n_epochs, dataloader=dataloader_sampled)
 ```
 
     Running epoch 1
+    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 408.64it/s]
+    Avg loss after epoch 1, is equal to 1.8333566987359216
+    Recall@10 (test set) after epoch 1, is equal to 0.17735042735042736
     
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 411.99it/s]
-    
-
-    Avg loss after epoch 1, is equal to 1.8401469694075152
     Running epoch 2
+    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 418.38it/s]
+    Avg loss after epoch 2, is equal to 1.7072859640175888
+    Recall@10 (test set) after epoch 2, is equal to 0.1735042735042735
     
+    .
+    .
+    .
 
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 495.21it/s]
-    
+    Running epoch 40
+    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 504.34it/s]
+    Avg loss after epoch 40, is equal to 0.42990228001413516
+    Recall@10 (test set) after epoch 40, is equal to 0.2811965811965812
 
-    Avg loss after epoch 2, is equal to 1.7137992132957025
-    Running epoch 3
-    
+```python
+# plot loss on train set
+plot_vector(losses, ylabel="loss", figsize=(14,5))
+```
 
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 460.87it/s]
-    
-
-    Avg loss after epoch 3, is equal to 1.5994389081315272
-    Running epoch 4
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 460.36it/s]
-    
-
-    Avg loss after epoch 4, is equal to 1.4974245762113478
-    Running epoch 5
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 445.29it/s]
-    
-
-    Avg loss after epoch 5, is equal to 1.4064033063163461
-    Running epoch 6
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 461.27it/s]
-    
-
-    Avg loss after epoch 6, is equal to 1.325462870603762
-    Running epoch 7
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 439.73it/s]
-    
-
-    Avg loss after epoch 7, is equal to 1.253332562595254
-    Running epoch 8
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 482.26it/s]
-    
-
-    Avg loss after epoch 8, is equal to 1.188744532304809
-    Running epoch 9
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 466.25it/s]
-    
-
-    Avg loss after epoch 9, is equal to 1.1305756301026175
-    Running epoch 10
-    
-
-    100%|█████████████████████████████████████████████████████████████████████████████| 1608/1608 [00:03<00:00, 494.38it/s]
-
-    Avg loss after epoch 10, is equal to 1.077807324660899
-    
 
     
+![png](/resources/recommender-systems-introduction/mf_negatives_train_loss.png)
     
-
-
-
-
-    [1.8401469694075152,
-     1.7137992132957025,
-     1.5994389081315272,
-     1.4974245762113478,
-     1.4064033063163461,
-     1.325462870603762,
-     1.253332562595254,
-     1.188744532304809,
-     1.1305756301026175,
-     1.077807324660899]
-
 
 
 
 ```python
-scored = score(model, positives_test_encoded, negatives_test_encoded)
+# plot recall@10 on test set
+plot_vector(recalls, ylabel="Recall@10", figsize=(14,5))
+```
+
+
+    
+![png](/resources/recommender-systems-introduction/mf_negatives_recall10_test.png)
+    
+
+
+
+```python
+scored = score(model_negatives, positives_test_encoded, negatives_test_encoded)
 for k in [5,10, 30]:
     recalls = [recall_k(k, pred) for pred in scored.values()]
     mean_recall = np.mean(recalls)
     print(f"Recall@{k} = {mean_recall}")
 ```
 
-    Recall@5 = 0.2076923076923077
-    Recall@10 = 0.23461538461538464
-    Recall@30 = 0.33687505557289515
-    
+    Recall@5 = 0.2923076923076923
+    Recall@10 = 0.2811965811965812
+    Recall@30 = 0.42681061824536726
+
+ Results are quite suprising. It looks like adding negatives does not improve model performance. There is of course more to it. Random sampling is simplest and weakest sampling methods. Using more advanced sampling techniques (like popularity sampling, where we sample items according to their popularity) could lead to different results. However, from our experiment we can conclude that adding negatives wasn't benefitial.   
 
 ## Conclusions
+In this tutorial we have learned the basics of recommender system. We started with general use cases of recommender systems. We then defined what recommender system is and how one can be implemented. We outlined the basics of the most popular model - matrix factorization. Many more advanced models build on that foundation, so it's crucial to understand the nitty gritty of matrix factorization. We then moved to practical example. Our dataset was subset of MovieLens dataset. We performed exploratory data analysis and prepared data for modelling. Some tricks were discussed along the way. Lastly we compared influence of sampling negatives for choosen accuracy metric. 
 
