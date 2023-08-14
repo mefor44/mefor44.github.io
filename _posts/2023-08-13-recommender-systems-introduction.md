@@ -43,6 +43,20 @@ $$
 \hat{r}_{ui} = q_i^T p_u.
 $$
 
+But this is explicit feedback case. We will focus on binary labels. In case of binary variable, we want to estimate probability of interaction, denoted $$p(u,i)$$. We can also use matrix factorization, with prediction formula as follows:
+
+$$
+p(u,i) = \sigma(q_i^T p_u),
+$$
+
+where $$\sigma$$ is logit function (same as in logistic regression). 
+
+Example:
+![Alt text](./../resources/recommender-systems-introduction/image.png "Title1")
+![Alt text](../resources/recommender-systems-introduction/image.png "Title2")
+![Alt text](./resources/recommender-systems-introduction/image.png "Title3")
+
+
 TODO: add more equations, a bit more theory, 1-2 images
 
 ## Hands-on example
