@@ -1,4 +1,8 @@
-
+---
+layout: post
+title: Blogging Like a Hacker
+mathjax: true
+---
 
 # Recommender Systems - introduction
 In this class let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
