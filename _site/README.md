@@ -1,12 +1,6 @@
----
-layout: post
-title:  "Recommender systems introduction"
-date:   2023-08-14 07:44:17 +0100
-author: Mateusz Marzec
----
 
-
-In this tutorial let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
+# Recommender Systems - introduction
+In this class let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
 1. Why,
 2. What, 
 3. How
@@ -37,12 +31,8 @@ In this tutorial, we will focus on Collaborative filtering techniques.
 ### Problem definition
 
 ### Matrix factorization techniques
-Let us assume $$f$$ is the number of factors. Now we will try to model user-item interactions in $$\mathbb{R}^f$$ space. With each item $$i$$ and each user $$u$$ we associate vectors $$q_i \in \mathbb{R}^f$$ and $$p_u  \in \mathbb{R}^f$$, accordingly. Vector $$q_i$$ represents items embeddings and vector $$p_u$$ represents users embeddings. The values of $$q_i$$ measure the extent of which a given item has some factor. Similarly, the values of $$p_u$$ show how much interest a given user has for a specific item factor. For user $$u$$ the overall interest for item $$i$$ is then captured by a dot product $$q_i^T p_u$$. Assuming we have access to users ratings we can write a formula for rating prediction:
-
-$$
-\hat{r}_{ui} = q_i^T p_u.
-$$
-
+Let us assume $f$ is the number of factors. Now we will try to model user-item interactions in $\mathbb{R}^f$ space. With each item $i$ and each user $u$ we associate vectors $q_i \in \mathbb{R}^f$ and $p_u  \in \mathbb{R}^f$, accordingly. Vector $q_i$ represents items embeddings and vector $p_u$ represents users embeddings. The values of $q_i$ measure the extent of which a given item has some factor. Similarly, the values of $p_u$ show how much interest a given user has for a specific item factor. For user $u$ the overall interest for item $i$ is then captured by a dot product $q_i^T p_u$. Assuming we have access to users ratings we can write a formula for rating prediction:
+$$\hat{r}_{ui} = q_i^T p_u.$$
 TODO: add more equations, a bit more theory, 1-2 images
 
 ## Hands-on example
@@ -181,9 +171,9 @@ plt.show()
 
 
 Let's split the data on the last day. So in our example this will be day "1970-01-18". <br />
-**Question: <br /> What are the advantages and disadvantages of such split compared to other types of splits? For other types of splitting consider random split* and leave-one-out split\*\*.** <br />
+**Question: <br /> What are the advantages and disadvantages of such split compared to other types of splits? For other types of splitting consider random split* and leave-one-out split\**.** <br />
 \* Random split is just randomly selecting interactions for test set. <br />
-\*\* Leave-one-out split is selecting just one item for each user. Assume that we know temporal ordering and in such case leave-one-out selects last item from each user interaction history. Recall, that's not the same ase leave-one-out cross validation strategy!!!
+\** Leave-one-out split is selecting just one item for each user. Assume that we know temporal ordering and in such case leave-one-out selects last item from each user interaction history. Recall, that's not the same ase leave-one-out cross validation strategy!!!
 
 **Answer:** TODO
 
@@ -279,15 +269,9 @@ class MatrixFactorization(nn.Module):
 ```
 
 ## Evaluation
-Evaluation of the recommender system can be performed in various settings. The two main ways to do so are online evaluation and offline evaluation. The online evaluation uses a continuous stream of users feedback to access system performance. In practice, it is often difficult to design settings allowing for such evaluation. Offline evaluation is based on historical data and it is the most common way of evaluating recommender system models. When designing evaluation methodology for a recommender system, we have to consider our goals. In the early stages of research in this field, calculating RMSE, MSE or MAE (Mean Absolute Error) was a very popular way of accessing the performance of the recommender system. This was, of course, connected with the data availability - the main datasets available online consisted of explicit ranking. Therefore, recommendation problem was often treated as a regression problem so typical regression metrics were used. When the data was in a binary form - metrics based on classification were used. The current standard are ranking based metrics. They give the biggest weights to the items placed at the top of the ranking list, which mimics the goal of top-k recommendation. <br /> In this tutorial we will focus on **Recall@k** which is a metric build upon Recall used for standard classification problems. For a given user we can define: 
+Evaluation of the recommender system can be performed in various settings. The two main ways to do so are online evaluation and offline evaluation. The online evaluation uses a continuous stream of users feedback to access system performance. In practice, it is often difficult to design settings allowing for such evaluation. Offline evaluation is based on historical data and it is the most common way of evaluating recommender system models. When designing evaluation methodology for a recommender system, we have to consider our goals. In the early stages of research in this field, calculating RMSE, MSE or MAE (Mean Absolute Error) was a very popular way of accessing the performance of the recommender system. This was, of course, connected with the data availability - the main datasets available online consisted of explicit ranking. Therefore, recommendation problem was often treated as a regression problem so typical regression metrics were used. When the data was in a binary form - metrics based on classification were used. The current standard are ranking based metrics. They give the biggest weights to the items placed at the top of the ranking list, which mimics the goal of top-k recommendation. <br /> In this tutorial we will focus on **Recall@k** which is a metric build upon Recall used for standard classification problems. For a given user we can define: $$Recall@k = \frac{number\ of\ relevant\ items}{total\ number\ of\ items},$$ the number $k$ is the length of the recommendation list. To calculate Recall@k for the whole dataset we average the values of recall for each user. <br />
 
-$$
-Recall@k = \frac{number\ of\ relevant\ items}{total\ number\ of\ items},
-$$
-
-the number $$k$$ is the length of the recommendation list. To calculate Recall@k for the whole dataset we average the values of recall for each user. <br />
-
-As we don't have negative interactions we can sample (again ;)) negatives for users from test set. For each user we sample 100 items, and consider them negative. Then if we want to calculate Recall@10 for user $$u$$ with two items in test set, we need to score all 102 items, and order them accordingly to obtained scores (higher score means higher probability of interaction). For Recall@10 we need to check how many of these two relevant items are in top-10 recommendation list and divide it by the total number of relevant items for this user (=2 in this case). 
+As we don't have negative interactions we can sample (again ;)) negatives for users from test set. For each user we sample 100 items, and consider them negative. Then if we want to calculate Recall@10 for user $u$ with two items in test set, we need to score all 102 items, and order them accordingly to obtained scores (higher score means higher probability of interaction). For Recall@10 we need to check how many of these two relevant items are in top-10 recommendation list and divide it by the total number of relevant items for this user (=2 in this case). 
 
 
 **Exercise:**<br />
