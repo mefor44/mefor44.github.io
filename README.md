@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Blogging Like a Hacker
-mathjax: true
 ---
 
 # Recommender Systems - introduction
