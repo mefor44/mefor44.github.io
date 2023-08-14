@@ -6,7 +6,7 @@ author: Mateusz Marzec
 ---
 
 
-In this tutorial let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
+In this tutorial let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant amount of items and users. After this totorial I want you to be able to answer the following questions:
 1. Why,
 2. What, 
 3. How
@@ -14,26 +14,26 @@ In this tutorial let's focus our attention on recommender systems. These are com
 Of course all in the context of recommender systems.
 
 ## Why
-Recommender systems aim at providing personalized product suggestions to customers. In the era of gargantuan numbers of different products choosing the right one for you can be an arduous task [paradox of choice](https://en.wikipedia.org/wiki/The_Paradox_of_Choice). Recommender systems aim to solve this problem. Having access to user browse history, demographical data, items characteristics it aims at reducing the space of items to only a few relevant (usually 10,20,...). Big retailers often rely on them. On Amazon 35% of their products are bought from recommendations produced by their recommender systems. For Netflix this number is even more substantial [more here](https://www.mckinsey.com/industries/retail/our-insights/how-retailers-can-keep-up-with-consumers).
+Recommender systems aim at providing personalized product suggestions to customers. In the era of gargantuan numbers of different products, choosing the right one for you can be an arduous task (see: [paradox of choice](https://en.wikipedia.org/wiki/The_Paradox_of_Choice)). Recommender systems aim to solve this problem. Having access to user browsing history, demographical data, items characteristics it aims at reducing the space of items to only a few relevant ones (usually 10,20,...). Big retailers rely on them heavily. On Amazon 35% of their products are bought from recommendations produced by their recommender systems. For Netflix this number is even more substantial ([more here](https://www.mckinsey.com/industries/retail/our-insights/how-retailers-can-keep-up-with-consumers)).
  
 ## What
 Product recommendation is a complex problem. Preparing a list of products is just one of the steps. Website design, how each product will be presented, how many products to show, etc. all play vital role in succesful product recommendations. This tutorial will only consider how to prepare a personalized recommendation list. 
 ### Data
-We may have different types of data to work with. The most basic datatype are user-item interactions. They are cornerstone for every recommender dataset. They encode the relationship between user and item. This relationship can be evaluated on Likert scale (ratings, like 1-5 stars) or by a binary variable. With each interaction we can associate additional user and item features. For instance in news recommendations we should consider the news title as an additional feature. From user side we can use users demographical data (gender, age, if such data is available). On of the often used categorisaction is **implicit feedback** and **explicit feedback** disctinction. 
+We may have different types of data to work with. The most basic datatype are user-item interactions. They are the cornerstone for every recommender dataset. They encode the relationship between user and item. This relationship can be evaluated on Likert scale (ratings, like 1-5 stars) or by a binary variable (click, no-click). With each interaction we can associate additional user and item features. For instance in news recommendations we should consider the news title as an additional feature. From user side we can use users demographical data (gender, age, if such data is available). One of the most often used categorisation is **implicit feedback** and **explicit feedback** disctinction. 
 **Implicit feedback** is a scenario when interactions are scored via binary variable. An example of such system is online shop with user browsing items. Each click can be considered '1' and each impression a '0'.
 **Explicit feedback** is a scenario when interactions are scored on the ordered scale - like ratings. An example of such system is a website with movies. Each user can rate and comment on a movie. Each rating can be then treated as a real number. 
-In practice, we more often have implicit feedback data. Not always the impressions will be available (so we may have data only about positive interactions), but this issue is tackled by negative sampling which will be discussed later on.
+In practice, we routinly spot implicit feedback data. Not always the impressions are available (so we may have data only about positive interactions), but this issue is tackled by negative sampling which will be discussed later on.
 
 ### Taxonomy
 Considering different data types that we can input into the recommender system and various conceptual goals. We can classify recommender systems into one of the few categories. Their characteristics are listed in table below. 
 ![image](https://github.com/mefor44/mefor44.github.io/assets/61019250/385c759d-6692-46b8-aa15-bc348f752a7a)
-The Collaborative filtering relies only on previous user behaviours, in contrast to the two former methods, which need some sort of user or item profile description. An example of such data is a sequence of product ratings given by a specific user. In the Collaborative filtering, we try to understand the relationships between users and items to identify new user-item connections. To learn the preferences of specific user u we do not limit ourselves to user u data (his ratings, or interactions with items) but we incorporate the data about other users behaviours. Doing so we can create latent representations for users and items (latent factor models) or find the "neighbors" - user or items with similar characteristics (neighborhood models). Latent factor models create low-dimensional representation for both users and items. Generally, factors are not interpretable. The most popular examples of latent factor models are matrix factorization techniques. These methods can provide both good scalability and predictive accuracy.
+The Collaborative filtering relies only on previous user behaviours, in contrast to the two latter methods, which need some sort of user or item profile description. An example of such data is a sequence of product ratings given by a specific user. In the Collaborative filtering, we try to understand the relationships between users and items to identify new user-item connections. To learn the preferences of specific user $$u$$ we do not limit ourselves to data from user $$u$$ (his ratings, or interactions with items) but we incorporate the data about other users behaviours. Doing so we can create latent representations for users and items (latent factor models) or find the "neighbors" - user or items with similar characteristics (neighborhood models). Latent factor models create low-dimensional representation for both users and items. Generally, factors are not interpretable. The most popular examples of latent factor models are matrix factorization techniques. These methods can provide both good scalability and predictive accuracy.
 Above-mentioned neighborhood models rely on item-item or user-user similarities. They estimate
 an unknown rating as a weighted average of similar items to the one that we want to rate. A more
 detailed description of these approaches will be introduced in section "How".
 
 ## How
-In this tutorial, we will focus on Collaborative filtering techniques.
+In this tutorial, we will focus only on Collaborative filtering techniques.
 ### Problem definition
 
 ### Matrix factorization techniques
@@ -56,11 +56,10 @@ where $$\sigma$$ is logit function (same as in logistic regression). A visual ex
   src="/resources/recommender-systems-introduction/matrix-factorization-vis.png"/>
   <figcaption class="figure-caption text-center">How matrix factorization works. (<a href="https://developers.google.com/machine-learning/recommendation/collaborative/matrix?hl=en">Image source</a>).</figcaption>
 </figure>
-In this example we decompose user-item interaction matrix into two 2 dimensional metrices. One for user representation and one for item representation. To obtain score for a given user-item pair we just take the dot product between correct vectors.
-
-TODO: add more equations, a bit more theory, 1-2 images
+In this example we decompose user-item interaction matrix into two 2 dimensional metrices. One for user representation and one for item representation. To obtain score for a given user-item pair we just take the dot product between correct vectors. Depending on the scenario model is trained with mean squared error loss (explicit feedback) or binary cross entropy (implicit feedback). We will return to the problem of choosing loss function in coding section.
 
 ## Hands-on example
+Let's start with importing necessary libraries.
 ```python
 import pandas as pd
 import torch
@@ -74,7 +73,7 @@ from tqdm import tqdm
 ```
 
 ## Read the data
-Read the data, then apply binarization. We convert the ratings to '1' when rating value is higher than 3. 
+Read the data, then apply binarization. We convert the ratings to '1' when rating value is higher than 3. We want to focus on implicit feedback case. Procedure of binarization is questionable, but here we just want to mimic implicit feedback dataset (for educational purposes). 
 
 
 ```python
@@ -174,15 +173,15 @@ ratings.shape, interactions.shape
 
 
 
+The dataset is tiny. We have only 609 users and 7363 movies. 
 
 ```python
 interactions.userId.nunique(), interactions.movieId.nunique()
 ```
 
-
-
-
     (609, 7363)
+
+
 
 
 
@@ -266,7 +265,7 @@ print(f"Test n obs after merge = {test_valid.shape[0]}")
 It looks like we have removed more than 90% of test set! This is very rare situation, but we are working on educational dataset, so this is not that important. It is just a subset of the whole MovieLens dataset, and we don't know how exactly the data was collected.
 
 ## Model
-In currect section we will implement Matrix Factorization model (and Neural Matrix Factorization model) 
+In currect section we will implement Matrix Factorization model.
 ### Matrix Factorization
 **Exercise:**<br /> Implement matrix factorization model. Use the cell below as a guide (change given functions).
 
@@ -281,6 +280,7 @@ class MF(nn.Module):
         
 ```
 
+**Solution:**
 
 ```python
 class MatrixFactorization(nn.Module):
@@ -293,13 +293,6 @@ class MatrixFactorization(nn.Module):
     def forward(self, user, item):
         user_emb, item_emb = self.users(user), self.items(item)
         return (user_emb * item_emb).sum(dim=1)
-```
-
-### Neural Matrix Factorization
-
-
-```python
-# TODO
 ```
 
 ## Evaluation
