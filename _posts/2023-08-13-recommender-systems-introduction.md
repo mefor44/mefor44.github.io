@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Rec sys intro"
+title:  "Reccommender systems introduction"
 date:   2023-08-14 07:44:17 +0100
-mathjax: true
+author: Mateusz Marzec
+usemathjax: true
 ---
 
-# Recommender Systems - introduction
-In this class let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
+In this tutorial let's focus our attention on recommender systems. These are complex but necessary elements for each business with abundant items and users. After this class I want you to be able to answer the following questions:
 1. Why,
 2. What, 
 3. How
