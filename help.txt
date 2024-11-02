@@ -1,0 +1,2 @@
+# run website locally from anaconda cmd with:
+`bundle exec jekyll serve`

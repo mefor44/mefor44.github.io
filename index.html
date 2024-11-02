@@ -1,4 +1,28 @@
 ---
-layout: home
+layout: default
+title: Home
 ---
 
+
+<h1>
+    <a href="{{ '/about' | relative_url }}">About Me</a>
+</h1>
+<p>👋 Hi! My name is Mateusz Marzec, and I am a Research Engineer at <a href="https://ml.allegro.tech/" target="_blank">Allegro</a>.</p>
+<p>Outside of work, I love practicing Brazilian Jiu-Jitsu 🥋 and playing board games 🎲.</p>
+<p>At work, I focus on making recommender systems better 🤖. During that process, I read a lot of research papers 📚 related to this topic, and I decided to create a blog 📝 to share the knowledge I gain with others—specifically technical people who are looking for new ideas 💡 but don’t want to dive deep into the academic papers.</p>
+
+
+<h2>Latest Blog Post</h2>
+{%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+{% assign latest_post = site.posts.first %}
+    <span class="post-meta">{{ latest_post.date | date: date_format }}</span>
+    <h3>
+      <a class="post-link" href="{{ latest_post.url | relative_url }}">
+        {{ latest_post.title | escape }}
+      </a>
+    </h3>
+    {%- if site.show_excerpts -%}
+      {{ latest_post.excerpt }}
+    {%- endif -%}
+
+<p>Read more posts on my <a href="{{ '/blog' | relative_url }}">Blog</a></p>
