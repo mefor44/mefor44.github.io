@@ -49,6 +49,7 @@ minima:
 header_pages:
   - blog.md
   - about.md
+  - bjj-private-quartz.md
 
 # Set to `true` to show excerpts on the homepage.
 #
