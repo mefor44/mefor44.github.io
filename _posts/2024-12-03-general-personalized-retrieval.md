@@ -2,14 +2,26 @@
 layout: post
 title: "The Hidden Magic Behind Personalized Recommendations: Optimizing the Retrieval Stage"
 author: Mateusz Marzec
-date: 2024-10-04
+date: 2024-12-04
 tags: retrieval, advanced
 ---
 
-## TODO
-- add table of content
-- add summary
-- show this for someone competent for a review
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [How / where are these models utilized?](#how--where-are-these-models-utilized)
+3. [Architecture and feature choices](#architecture-and-feature-choices)
+    1. [Meta](#meta)
+    2. [JD](#jd)
+    3. [Etsy](#etsy)
+    4. [Ebay](#ebay)
+6. [Training details](#training-details)
+7. [Serving](#serving)
+8. [Summary](#summary)
+9. [References](#refences)
+
+
+
 
 ## Introduction
 In this blog post I will discuss how some of the most known companies are making their "retrieval" more personalized. In a typical large scale industry setting, the amount of items and users is often humongous, which forces developers to design recommendation engines as a cascade of models rather than one standalone model. This can look like diagram below:
@@ -23,7 +35,9 @@ For purpose of this post lest's take a closer look how companies like Meta (Face
 TODO: add logos of aftermentioned companies into one picture
 
 
-## How / where are these models utilzed?
+
+
+## How / where are these models utilized?
 In most cases they are used in search (JD, Etsy, Meta). For Ebay, they use model to create personalized carousels e.g. "sponsored products based on items you recently viewed". For Pinterest, they indirectly suggested that model outputs are used in many downstream task (mainly ranking models). Their user embeddings can be also utlized to retrieve relevant items for places like Pinterest Homefeed. In Meta paper they mention developing the same model for different subdomain of search (groups search, people search, page search).
 
 ## Architecture and feature choices
@@ -67,7 +81,7 @@ In this section word "Pins" is used interchangebly with word "item". Authors of 
 
 Their model tries to learn long-term user preferences based on engagement signals from Pinterest Homefeed page. 
 <div style="text-align:center;">
-<i>Our primary objective is to learn a model that is able to predict a user’s positive future engagement over a 14 day time window after the generation of their embedding.</i>
+<i>Our primary objective is to learn a model that is able to predict a user's positive future engagement over a 14 day time window after the generation of their embedding.</i>
 </div>
 <p></p>
 It is quite an anusual task, in traditional sequence modelling it is more common to train model on "next action prediction" task. Considered positive user actions are: Pin save, a Pin close-up lasting over 10s, or a long clickthrough (>10s) to the link underlying a Pin. Based on sequence of positive user actions, the aim is to learn user representation that well alignes with target Pin representations. Pin representaions are obtained by PinSage model (addional trainable MLP is added at the end). PinSage is a graph-based neural network designed to generate high-quality embeddings for Pins by aggregating visual, text, and engagement data.
@@ -244,12 +258,44 @@ PinnerSage is their current production system for generating user embeddings. Se
 
 Using user embeddings from Pinnerformer in downstream Ads models improves the results on many surfaces.
 
-
-
 ## Summary
 
+This article explores how major companies like Meta, JD, Etsy, Ebay, and Pinterest implement personalized retrieval systems in their recommendation engines. The key findings include:
 
+1. **Architecture Patterns**: Most companies employ variations of the Two-tower model architecture, which decouples query and item towers for efficient retrieval. This design allows for efficient Approximate Nearest Neighbors (ANN) search during inference.
 
+2. **Feature Engineering**: Companies utilize diverse features including:
+   - User demographics and social connections
+   - Historical user behavior
+   - Item metadata (titles, categories, etc.)
+   - Location information
+   - Temporal features
+
+3. **Training Approaches**:
+   - Loss functions: Max margin triplet loss and sampled softmax are commonly used
+   - Negative sampling: Mixed Negative Sampling (combining random and hard negatives) proves effective
+   - Human-annotated data helps improve model performance in corner cases
+
+4. **Serving Optimizations**:
+   - Offline processing of item embeddings
+   - Real-time query embedding generation
+   - Efficient ANN implementations (using libraries like Faiss)
+   - Model sharding for handling multiple models
+   - Trade-offs between inference frequency and performance
+
+5. **Innovative Techniques**:
+   - Multi-head query towers for handling polysemous queries
+   - Clustering for improving recommendation diversity
+   - ANN-based product boosting
+   - Model ensembling for balancing recall and precision
+
+6. **Results**: All implementations show significant improvements over baseline systems, particularly for long-tail queries. The improvements are validated through A/B testing, with metrics showing:
+   - Increased conversion rates
+   - Higher gross merchandise value
+   - Better user engagement
+   - Improved diversity in recommendations
+
+The article demonstrates that while personalized retrieval systems can be complex, they provide substantial value in improving recommendation quality and user experience. The key is finding the right balance between model sophistication, serving efficiency, and business requirements.
 
 ## References
 
